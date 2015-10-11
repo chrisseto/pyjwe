@@ -11,7 +11,7 @@ def parse_requirements(requirements):
         return [l.strip('\n') for l in f if l.strip('\n') and not l.startswith('#')]
 
 
-version = '0.1.2'
+version = '0.1.3'
 requirements = parse_requirements('requirements.txt')
 
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
