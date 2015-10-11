@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-import re
 import sys
 
 from setuptools import find_packages, setup
@@ -12,16 +11,7 @@ def parse_requirements(requirements):
         return [l.strip('\n') for l in f if l.strip('\n') and not l.startswith('#')]
 
 
-def get_version(package):
-    """
-    Return package version as listed in `__version__` in `init.py`.
-    """
-    with open(os.path.join(package, '__init__.py'), 'rb') as init_py:
-        src = init_py.read().decode('utf-8')
-        return re.search("__version__ = ['\"]([^'\"]+)['\"]", src).group(1)
-
-
-version = get_version('jwt')
+version = '0.1.1'
 requirements = parse_requirements('requirements.txt')
 
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
