@@ -11,7 +11,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 backend = default_backend()
 
 
-def kdf(key, salt=b'You should really salt this yourself', length=32, iterations=10000):
+def kdf(key, salt, length=32, iterations=10000):
     return PBKDF2HMAC(
         salt=salt,
         length=length,
