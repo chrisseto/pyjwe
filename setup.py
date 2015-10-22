@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import re
 import os
 import sys
 
@@ -11,40 +12,48 @@ def parse_requirements(requirements):
         return [l.strip('\n') for l in f if l.strip('\n') and not l.startswith('#')]
 
 
-version = '0.1.6'
-requirements = parse_requirements('requirements.txt')
+def read(fname):
+    with open(fname) as fp:
+        content = fp.read()
+    return content
 
-with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
-    long_description = readme.read()
+
+def find_version(fname):
+    """Attempts to find the version number in the file names fname.
+    Raises RuntimeError if not found.
+    """
+    version = ''
+    with open(fname, 'r') as fp:
+        reg = re.compile(r'__version__ = [\'"]([^\'"]*)[\'"]')
+        for line in fp:
+            m = reg.match(line)
+            if m:
+                version = m.group(1)
+                break
+    if not version:
+        raise RuntimeError('Cannot find version information')
+    return version
+
+__version__ = find_version('jwe/__init__.py')
+
 
 if sys.argv[-1] == 'publish':
     os.system('python setup.py sdist upload')
     os.system('python setup.py bdist_wheel upload')
     print('You probably want to also tag the version now:')
-    print(" git tag -a {0} -m 'version {0}'".format(version))
+    print(" git tag -a {0} -m 'version {0}'".format(__version__))
     print(' git push --tags')
     sys.exit()
 
-tests_require = [
-    'pytest',
-    'pytest-cov',
-    'pytest-runner',
-]
-
-needs_pytest = set(('pytest', 'test', 'ptr')).intersection(sys.argv)
-pytest_runner = ['pytest-runner'] if needs_pytest else []
-
 setup(
     name='PyJWE',
-    version=version,
+    version=__version__,
     description='JSON Web Encryption implementation in Python',
     license='MIT',
     keywords='jwe json encryption token security signing',
     url='http://github.com/chrisseto/pyjwe',
-    packages=find_packages(
-        exclude=["*.tests", "*.tests.*", "tests.*", "tests"]
-    ),
-    long_description=long_description,
+    packages=find_packages(exclude=('test*', 'examples')),
+    long_description=read('README.md'),
     classifiers=[
         'Intended Audience :: Developers',
         'Natural Language :: English',
@@ -57,16 +66,5 @@ setup(
         'Topic :: Utilities',
     ],
     test_suite='tests',
-    setup_requires=pytest_runner,
-    tests_require=tests_require,
-    install_requires=requirements,
-    extras_require=dict(
-        test=tests_require,
-        crypto=['cryptography'],
-        flake8=[
-            'flake8',
-            'flake8-import-order',
-            'pep8-naming'
-        ]
-    ),
+    install_requires=parse_requirements('requirements.txt')
 )
