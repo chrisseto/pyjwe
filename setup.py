@@ -34,6 +34,7 @@ def find_version(fname):
         raise RuntimeError('Cannot find version information')
     return version
 
+
 __version__ = find_version('jwe/__init__.py')
 
 
